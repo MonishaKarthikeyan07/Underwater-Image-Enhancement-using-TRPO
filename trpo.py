@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 from uwcc import uwcc
+from model import PhysicalNN  # Import PhysicalNN from model.py
 
 class TRPOAgent:
     def __init__(self):
