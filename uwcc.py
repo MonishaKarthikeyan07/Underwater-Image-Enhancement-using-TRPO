@@ -1,8 +1,7 @@
-import torch.utils.data as data
+import torch
 import os
 from PIL import Image
-import numpy as np
-from torchvision import transforms
+from torch.utils.data import Dataset
 
 def img_loader(path):
     img = Image.open(path)
@@ -19,7 +18,7 @@ def get_imgs_list(ori_dirs,ucc_dirs):
 
     return img_list
 
-class uwcc(data.Dataset):
+class uwcc(Dataset):
     def __init__(self, ori_dirs, ucc_dirs, train=True, loader=img_loader):
         super(uwcc, self).__init__()
 
@@ -41,9 +40,7 @@ class uwcc(data.Dataset):
 
         if self.train == True:
             oritransform = transforms.Compose([
-                # transforms.RandomResizedCrop(256,scale=(0.5,1.0)),
-                # transforms.RandomHorizontalFlip(),
-                # transforms.RandomVerticalFlip(),
+                # Data augmentation transforms for training
                 transforms.ToTensor(),
             ])
             ucctransform = transforms.Compose([
