@@ -6,7 +6,6 @@ from model import PhysicalNN
 import argparse
 from torchvision import transforms
 import datetime
-import math
 from trpo import TRPO
 
 def main(checkpoint, imgs_path, result_path):
@@ -38,30 +37,24 @@ def main(checkpoint, imgs_path, result_path):
 
     starttime = datetime.datetime.now()
     for imgdir in ori_dirs:
-        img_name = (imgdir.split('/')[-1]).split('.')[0]
+        img_name = os.path.splitext(os.path.basename(imgdir))[0]
         img = Image.open(imgdir)
         inp = testtransform(img).unsqueeze(0)
         inp = inp.to(device)
         out = trpo.predict(inp)
 
         corrected = unloader(out.cpu().squeeze(0))
-        dir = '{}/results_{}'.format(result_path, checkpoint['epoch'])
+        dir = os.path.join(result_path, 'results_{}'.format(checkpoint['epoch']))
         if not os.path.exists(dir):
             os.makedirs(dir)
-        corrected.save(dir+'/{}corrected.png'.format(img_name))
+        corrected.save(os.path.join(dir, '{}_corrected.png'.format(img_name)))
     endtime = datetime.datetime.now()
-    print(endtime-starttime)
+    print("Total time taken:", endtime - starttime)
 
 if __name__ == '__main__':
-
     parser = argparse.ArgumentParser()
     parser.add_argument('--checkpoint', help='checkpoints path', required=True)
-    parser.add_argument(
-            '--images', help='test images folder', default='./test_img/')
-    parser.add_argument(
-            '--result', help='results folder', default='./results/')
+    parser.add_argument('--images', help='test images folder', default='./test_img/')
+    parser.add_argument('--result', help='results folder', default='./results/')
     args = parser.parse_args()
-    checkpoint = args.checkpoint
-    imgs = args.images
-    result_path = args.result
-    main(checkpoint=checkpoint, imgs_path=imgs, result_path=result_path)
+    main(checkpoint=args.checkpoint, imgs_path=args.images, result_path=args.result)
